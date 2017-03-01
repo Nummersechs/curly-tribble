@@ -126,12 +126,12 @@ public class View extends GraphicsProgram {
 	 * model and constructs the view out of that
 	 */
 	public void update() {
-
+		
 		// Pointcounter? Its main purpose however is making obstacles
-		i++;
+		pointCounter++;
 
 		// makes the obstacle fastter, the more time has passed
-		if (i % 1000 == 0 && speed <= SPEED_LIMIT) {
+		if (pointCounter % 1000 == 0 && speed <= SPEED_LIMIT) {
 			speed++;
 			if (obstacleTime > 10)
 				obstacleTime -= 10;
@@ -152,34 +152,29 @@ public class View extends GraphicsProgram {
 
 		// Obstacles
 		if (obstacleLength <= OBSTACLE_START) {
+
+			// determine the position of the obstacle
 			this.model.getObstacle().setY(this.model.obstacleState());
-			switch (i % 3) {
+
+			obstacleLength = OBSTACLE_LENGTH;
+			switch (obstacleCounter) {
 			case 0:
 				y0 = this.model.getObstacle().getY();
-				obstacle0 = new GRect(this.model.getObstacle().getX(), y0, this.model.getObstacle().getWidth(),
-						this.model.getObstacle().getHeight());
-				obstacle0.setFilled(true);
-				obstacle0.setColor(this.model.getObstacle().getColor());
+				obstacle0.setLocation(this.model.getObstacle().getX(), y0);
 				o0 = true;
-				obstacleLength = OBSTACLE_LENGTH;
+				obstacleCounter++;
 				break;
 			case 1:
 				y1 = this.model.getObstacle().getY();
-				obstacle1 = new GRect(this.model.getObstacle().getX(), y1, this.model.getObstacle().getWidth(),
-						this.model.getObstacle().getHeight());
-				obstacle1.setFilled(true);
-				obstacle1.setColor(this.model.getObstacle().getColor());
+				obstacle1.setLocation(this.model.getObstacle().getX(), y0);
 				o1 = true;
-				obstacleLength = OBSTACLE_LENGTH;
+				obstacleCounter++;
 				break;
 			case 2:
 				y2 = this.model.getObstacle().getY();
-				obstacle2 = new GRect(this.model.getObstacle().getX(), y2, this.model.getObstacle().getWidth(),
-						this.model.getObstacle().getHeight());
-				obstacle2.setFilled(true);
-				obstacle2.setColor(this.model.getObstacle().getColor());
+				obstacle2.setLocation(this.model.getObstacle().getX(), y0);
 				o2 = true;
-				obstacleLength = OBSTACLE_LENGTH;
+				obstacleCounter -= 2;
 				break;
 
 			}
@@ -212,11 +207,10 @@ public class View extends GraphicsProgram {
 		player.setFilled(true);
 		this.add(player);
 
-		//pointcounter
-		GLabel points = new GLabel("Points: "+((int)(i/10)),600,700);
+		GLabel points = new GLabel("Points: " + ((int) (pointCounter / 10)), 600, 700);
 		points.setFont("SansSerif-36");
 		add(points);
-		
+
 		obstacleLength -= speed;
 	}
 	
