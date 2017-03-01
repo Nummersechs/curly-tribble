@@ -31,14 +31,13 @@ public class View extends GraphicsProgram {
 	private Controller contrl;
 	private Timer timer;
 
-	//have more obstacles in order to have more obstacles in the game
+	// have more obstacles in order to have more obstacles in the game
 	private GRect obstacle0;
 	private GRect obstacle1;
 	private GRect obstacle2;
 
 	// length between the obstacles (I hope)
 	private int obstacleLength;
-
 	private final static int OBSTACLE_LENGTH = Model.OBSTACLE_START_X;
 	private final static int OBSTACLE_START = 400;
 
@@ -48,20 +47,20 @@ public class View extends GraphicsProgram {
 	private int y1;
 	private int y2;
 
-	//activate each obstacles
+	// activate each obstacles
 	private boolean o0;
 	private boolean o1;
 	private boolean o2;
 
-	// Pointcounter? Its main purpose however is making obstacles
-	private int i;
+	// obstacle counter
+	private int obstacleCounter;
 
 	// speed of the obstacle
 	private int speed;
-	private final static int SPEED_LIMIT = 30;
+	private final static int SPEED_LIMIT = 25;
 
-	// the frequency of the obstacle
-	private int obstacleTime;
+	// Pointcounter
+	private int pointCounter;
 	
 	/*
 	 * constructor
@@ -89,10 +88,32 @@ public class View extends GraphicsProgram {
 	 * contains the loop that refreshes the canvas at given interval
 	 */
 	public void run() {
-		i = 0;
+		// Create the three obstacle objects here, so that the object wont
+		// disappear after 200 points
+		// or not... whatever case closed and don't know how T.T
+		// But seriously I think creating these objects once is better than
+		// creating them over and over again
+		obstacle0 = new GRect(this.model.getObstacle().getX(), y0, this.model.getObstacle().getWidth(),
+				this.model.getObstacle().getHeight());
+		obstacle0.setFilled(true);
+		obstacle0.setColor(this.model.getObstacle().getColor());
+
+		//second obstacle
+		obstacle1 = new GRect(this.model.getObstacle().getX(), y1, this.model.getObstacle().getWidth(),
+				this.model.getObstacle().getHeight());
+		obstacle1.setFilled(true);
+		obstacle1.setColor(this.model.getObstacle().getColor());
+
+		//third obstacle
+		obstacle2 = new GRect(this.model.getObstacle().getX(), y2, this.model.getObstacle().getWidth(),
+				this.model.getObstacle().getHeight());
+		obstacle2.setFilled(true);
+		obstacle2.setColor(this.model.getObstacle().getColor());
+
+		pointCounter = 0;
+
+		obstacleCounter = 0;
 		speed = 10;
-		obstacleTime = 100;
-		obstacleLength = OBSTACLE_START;
 		while (true) {
 			this.update();
 			this.contrl.updateModel(System.currentTimeMillis());
@@ -133,8 +154,6 @@ public class View extends GraphicsProgram {
 		// makes the obstacle fastter, the more time has passed
 		if (pointCounter % 1000 == 0 && speed <= SPEED_LIMIT) {
 			speed++;
-			if (obstacleTime > 10)
-				obstacleTime -= 10;
 		}
 
 		this.removeAll();
