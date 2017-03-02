@@ -1,11 +1,13 @@
-package projektoo;
+package projektooneu;
 
 import java.awt.Color;
 import java.util.List;
 
+import acm.util.RandomGenerator;
+
 /**
  * Im Model sammeln sich Konstanten und Objekte und ein paar Methoden. Ein paar
- * Konstanten müssen nicht unbedingt Konstanten bleiben.
+ * Konstanten mÃ¼ssen nicht unbedingt Konstanten bleiben.
  * 
  * @author bsg
  * @param <E>
@@ -20,18 +22,18 @@ public class Model<E> {
 	/*
 	 * i guess it is von vorteil, die supportete resolution im model zu
 	 * behandeln. die view kann dann hochskalieren oder herunterskalieren. die
-	 * werte hier sind praktischerweise ein vielfaches der auflösung des
+	 * werte hier sind praktischerweise ein vielfaches der auflÃ¶sung des
 	 * hochhauses. das sollte alles durch 50 teilbar sein. nah, man darf sich
 	 * doch auch mehr genauigkeit erlauben. wenn man dann eine low-res version
-	 * auf einem high-res bildschirm spielenmöchte, dann skaliert man auf der
+	 * auf einem high-res bildschirm spielenmÃ¶chte, dann skaliert man auf der
 	 * view erst herunter und verliert genauigkeit und skaliert dann wieder
-	 * hoch. dann hat mans pixelig. das model liefert daten in seiner präzision
-	 * und das view baut sich daraus eine niedrigauflösende sicht. ähnlich wird
-	 * man dann für dass pixelarray die graphischen objekte, die man auf das
-	 * canvas setzen würde wie man es auf unseren konventionellen views getan
-	 * hat, überprüfen, wo im niedrigauflösenden raster sie ausreichend sind, um
-	 * sie als "daseiend" bewerten zu können. ich finde, das klingt umsetzbar.
-	 * (dies sind selbstgespräche, nevermind)
+	 * hoch. dann hat mans pixelig. das model liefert daten in seiner prÃ¤zision
+	 * und das view baut sich daraus eine niedrigauflÃ¶sende sicht. Ã¤hnlich wird
+	 * man dann fÃ¼r dass pixelarray die graphischen objekte, die man auf das
+	 * canvas setzen wÃ¼rde wie man es auf unseren konventionellen views getan
+	 * hat, Ã¼berprÃ¼fen, wo im niedrigauflÃ¶senden raster sie ausreichend sind, um
+	 * sie als "daseiend" bewerten zu kÃ¶nnen. ich finde, das klingt umsetzbar.
+	 * (dies sind selbstgesprÃ¤che, nevermind)
 	 */
 	public static final int RESOLUTION_X = 1400;
 	public static final int RESOLUTION_Y = 700;
@@ -60,6 +62,20 @@ public class Model<E> {
 	
 	// Color constants
 	public static final Color BACKGROUND_COLOR = Color.GRAY;
+	
+	//Obastacle variables
+	public static final int OBSTACLE_HEIGHT = 150;
+	public static final int OBSTACLE_WIDTH = 50;
+	public static final int OBSTACLE_START_X = 1400;
+	public static final int OBSTACLE_START_Y_ABOVE = 300;
+	public static final int OBSTACLE_START_Y_BELOW = 450;
+
+	private int obstacleY = obstacleState();
+
+	static RandomGenerator rgen = new RandomGenerator();
+	int random;
+	
+	int i = 0;
 
 	/*
 	 * class variables
@@ -72,6 +88,14 @@ public class Model<E> {
 	private Hero hero;
 	private Background background;
 	private Ground ground;
+	private Obstacle obstacle0;
+	private Obstacle obstacle1;
+	private Obstacle obstacle2;
+	
+	private Mass heroMass;
+	private Mass obstacle0Mass;
+	private Mass obstacle1Mass;
+	private Mass obstacle2Mass;
 
 	/*
 	 * constructor
@@ -88,7 +112,50 @@ public class Model<E> {
 		this.hero = new Hero(HERO_START_X, HERO_START_Y, HERO_WIDTH, HERO_HEIGHT, Color.YELLOW);
 		this.background = new Background(BACKGROUND_COLOR);
 		this.ground = new Ground(GROUND_Y, GROUND_HEIGHT, Color.GREEN);
-		
+		this.obstacle0 = new Obstacle(OBSTACLE_START_X, obstacleY, OBSTACLE_WIDTH, OBSTACLE_HEIGHT, Color.RED);
+		this.obstacle1 = new Obstacle(OBSTACLE_START_X, obstacleY, OBSTACLE_WIDTH, OBSTACLE_HEIGHT, Color.RED);
+		this.obstacle2 = new Obstacle(OBSTACLE_START_X, obstacleY, OBSTACLE_WIDTH, OBSTACLE_HEIGHT, Color.RED);
+		this.heroMass = new Mass(this.hero);
+		this.obstacle0Mass = new Mass(this.obstacle0);
+		this.obstacle1Mass = new Mass(this.obstacle1);
+		this.obstacle2Mass = new Mass(this.obstacle2);
+	}
+	
+	
+	
+	public void setObstacleY(int y){
+		this.obstacleY = y;
+	}
+	
+	public void updateMass(){
+		this.heroMass = new Mass(this.hero);
+		this.obstacle0Mass = new Mass(this.obstacle0);
+		this.obstacle1Mass = new Mass(this.obstacle1);
+		this.obstacle2Mass = new Mass(this.obstacle2);
+	}
+	
+	public int obstacleState() {
+		random = rgen.nextInt(1, 2);
+		System.out.println(random);
+		if(i == 1) {
+			i= random;
+			return OBSTACLE_START_Y_ABOVE;
+		}else{
+			i= random;
+			return OBSTACLE_START_Y_BELOW;
+		}
+	}
+
+	public boolean o0Crash(){
+		return this.heroMass.collide(obstacle0Mass);
+	}
+	
+	public boolean o1Crash(){
+		return this.heroMass.collide(obstacle1Mass);
+	}
+	
+	public boolean o2Crash(){
+		return this.heroMass.collide(obstacle2Mass);
 	}
 
 	/*
@@ -114,4 +181,27 @@ public class Model<E> {
 		return oldTime;
 	}
 
+	public Obstacle getObstacle0() {
+		return obstacle0;
+	}	
+	
+	public Obstacle getObstacle1() {
+		return obstacle1;
+	}	
+	
+	public Obstacle getObstacle2() {
+		return obstacle2;
+	}
+	
+	public Mass getObstacle0Mass(){
+		return this.obstacle0Mass;
+	}
+	
+	public Mass getObstacle1Mass(){
+		return this.obstacle1Mass;
+	}
+	
+	public Mass getObstacle2Mass(){
+		return this.obstacle2Mass;
+	}
 }
