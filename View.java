@@ -93,22 +93,10 @@ public class View extends GraphicsProgram {
 		// or not... whatever case closed and don't know how T.T
 		// But seriously I think creating these objects once is better than
 		// creating them over and over again
-		obstacle0 = new GRect(this.model.getObstacle().getX(), y0, this.model.getObstacle().getWidth(),
-				this.model.getObstacle().getHeight());
-		obstacle0.setFilled(true);
-		obstacle0.setColor(this.model.getObstacle().getColor());
-
-		//second obstacle
-		obstacle1 = new GRect(this.model.getObstacle().getX(), y1, this.model.getObstacle().getWidth(),
-				this.model.getObstacle().getHeight());
-		obstacle1.setFilled(true);
-		obstacle1.setColor(this.model.getObstacle().getColor());
-
-		//third obstacle
-		obstacle2 = new GRect(this.model.getObstacle().getX(), y2, this.model.getObstacle().getWidth(),
-				this.model.getObstacle().getHeight());
-		obstacle2.setFilled(true);
-		obstacle2.setColor(this.model.getObstacle().getColor());
+		
+		obstacle0 = makeGRect(this.model.getObstacle0());
+		obstacle1 = makeGRect(this.model.getObstacle1());
+		obstacle2 = makeGRect(this.model.getObstacle2());
 
 		pointCounter = 0;
 
@@ -160,38 +148,31 @@ public class View extends GraphicsProgram {
 		// adds the player rectangle to the view
 
 		GRect background = makeGRect(this.model.getBackground());
-		background.setFillColor(this.model.getBackground().getColor());
-		background.setFilled(true);
 		this.add(background);
 
 		GRect ground = makeGRect(this.model.getGround());
-		ground.setFillColor(this.model.getGround().getColor());
-		ground.setFilled(true);
 		this.add(ground);
 
 		// Obstacles
 		if (obstacleLength <= OBSTACLE_START) {
 
-			// determine the position of the obstacle
-			this.model.getObstacle().setY(this.model.obstacleState());
-
 			obstacleLength = OBSTACLE_LENGTH;
 			switch (obstacleCounter) {
 			case 0:
-				y0 = this.model.getObstacle().getY();
-				obstacle0.setLocation(this.model.getObstacle().getX(), y0);
+				this.model.getObstacle0().setY(this.model.obstacleState());
+				this.model.getObstacle0().setX(Model.OBSTACLE_START_X);
 				o0 = true;
 				obstacleCounter++;
 				break;
 			case 1:
-				y1 = this.model.getObstacle().getY();
-				obstacle1.setLocation(this.model.getObstacle().getX(), y0);
+				this.model.getObstacle1().setY(this.model.obstacleState());
+				this.model.getObstacle1().setX(Model.OBSTACLE_START_X);
 				o1 = true;
 				obstacleCounter++;
 				break;
 			case 2:
-				y2 = this.model.getObstacle().getY();
-				obstacle2.setLocation(this.model.getObstacle().getX(), y0);
+				this.model.getObstacle2().setY(this.model.obstacleState());
+				this.model.getObstacle2().setX(Model.OBSTACLE_START_X);
 				o2 = true;
 				obstacleCounter -= 2;
 				break;
@@ -199,22 +180,25 @@ public class View extends GraphicsProgram {
 			}
 		}
 
-		if (o0 == true && (obstacle0.getX() > -this.model.getObstacle().getWidth())) {
-			obstacle0.setLocation(obstacle0.getX() - speed, y0);
+		if (o0 == true && (this.model.getObstacle0().getX() > -obstacle0.getWidth())) {
+			obstacle0.setLocation(this.model.getObstacle0().getNewX(), obstacle0.getY());
+			this.model.getObstacle0().setX(this.model.getObstacle0().getNewX());
 			this.add(obstacle0);
 		} else {
 			o0 = false;
 		}
 
-		if (o1 == true && (obstacle1.getX() > -this.model.getObstacle().getWidth())) {
-			obstacle1.setLocation(obstacle1.getX() - speed, y1);
+		if (o1 == true && (this.model.getObstacle1().getX() > -obstacle1.getWidth())) {
+			obstacle1.setLocation(this.model.getObstacle1().getNewX(), obstacle1.getY());
+			this.model.getObstacle1().setX(this.model.getObstacle1().getNewX());
 			this.add(obstacle1);
 		} else {
 			o1 = false;
 		}
 
-		if (o2 == true && (obstacle2.getX() > -this.model.getObstacle().getWidth())) {
-			obstacle2.setLocation(obstacle2.getX() - speed, y2);
+		if (o2 == true && (this.model.getObstacle2().getX() > -obstacle2.getWidth())) {
+			obstacle2.setLocation(this.model.getObstacle2().getNewX(), obstacle2.getY());
+			this.model.getObstacle2().setX(this.model.getObstacle2().getNewX());
 			this.add(obstacle2);
 		} else {
 			o2 = false;
@@ -222,8 +206,6 @@ public class View extends GraphicsProgram {
 
 		// is the last, so it can be the top layer
 		GRect player = makeGRect(this.model.getHero());
-		player.setFillColor(this.model.getHero().getColor());
-		player.setFilled(true);
 		this.add(player);
 
 		GLabel points = new GLabel("Points: " + ((int) (pointCounter / 10)), 600, 700);
@@ -235,6 +217,10 @@ public class View extends GraphicsProgram {
 	
 	public GRect makeGRect(Rectangle rec) {
 		GRect grect = new GRect(rec.getX(), rec.getY(), rec.getWidth(), rec.getHeight());
+		if(rec.getColor() != null){
+			grect.setFillColor(rec.getColor());
+			grect.setFilled(true);
+		}
 		return grect;
 	}
 
