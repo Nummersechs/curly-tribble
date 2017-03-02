@@ -1,4 +1,4 @@
-package projektoo;
+package projektooneu;
 
 import acm.program.*;
 
@@ -10,14 +10,14 @@ import acm.graphics.*;
  * Dies ist unsere runnable Class. Diese Klasse extends das GraphicsProgram aus
  * der acm library. Ich bin ein wenig unsicher, wie die funktioniert. Diese
  * Klasse hat einen Konstruktor und zwei Instanzvariablen. Das GraphicsProgram
- * muss beim Ausführen automatisch auch den Konstruktor aufrufen, sonst würde
+ * muss beim AusfÃ¼hren automatisch auch den Konstruktor aufrufen, sonst wÃ¼rde
  * das alles nicht funktionieren, aber es funktionert.
  * 
- * Nun denn. Diese Klasse ist für zwei Sachen zuständig. Zum einen initialisiert
- * sie ein Spiel, indem sie im Konstruktor ein Model erstellt, mit diesem auch
- * einen Controller erstellt, und initNewGame() aufruft. Zum anderen bereitet
- * sie für den Nutzer die View auf mit der true-schleife, und leitet Input
- * Events an den Controller weiter.
+ * Nun denn. Diese Klasse ist fÃ¼r zwei Sachen zustÃ¤ndig. Zum einen
+ * initialisiert sie ein Spiel, indem sie im Konstruktor ein Model erstellt, mit
+ * diesem auch einen Controller erstellt, und initNewGame() aufruft. Zum anderen
+ * bereitet sie fÃ¼r den Nutzer die View auf mit der true-schleife, und leitet
+ * Input Events an den Controller weiter.
  * 
  * @author bsg
  *
@@ -39,29 +39,21 @@ public class View extends GraphicsProgram {
 	// length between the obstacles (I hope)
 	private int obstacleLength;
 	private final static int OBSTACLE_LENGTH = Model.OBSTACLE_START_X;
-	private final static int OBSTACLE_START = 400;
-
-	// y-coordinate for the obstacles. it determines whether the obstacles are
-	// on the top or on the bottom
-	private int y0;
-	private int y1;
-	private int y2;
-
-	// activate each obstacles
-	private boolean o0;
-	private boolean o1;
-	private boolean o2;
+	private final static int OBSTACLE_START = 600;
 
 	// obstacle counter
 	private int obstacleCounter;
 
 	// speed of the obstacle
-	private int speed;
-	private final static int SPEED_LIMIT = 25;
+	int speed;
+	private final static int SPEED_LIMIT = 20;
 
 	// Pointcounter
 	private int pointCounter;
-	
+
+	// end of the game
+	private boolean stop;
+
 	/*
 	 * constructor
 	 */
@@ -77,9 +69,8 @@ public class View extends GraphicsProgram {
 	 */
 	public void init() {
 		//
-		this.setSize(Model.RESOLUTION_X, Model.RESOLUTION_Y);		
+		this.setSize(Model.RESOLUTION_X, Model.RESOLUTION_Y);
 		this.model.initNewGame();
-
 
 		addKeyListeners();
 	}
@@ -93,16 +84,18 @@ public class View extends GraphicsProgram {
 		// or not... whatever case closed and don't know how T.T
 		// But seriously I think creating these objects once is better than
 		// creating them over and over again
-		
+
 		obstacle0 = makeGRect(this.model.getObstacle0());
 		obstacle1 = makeGRect(this.model.getObstacle1());
 		obstacle2 = makeGRect(this.model.getObstacle2());
 
 		pointCounter = 0;
-
+		speed = this.model.getObstacle0().getSpeed();
 		obstacleCounter = 0;
-		speed = 10;
-		while (true) {
+		obstacleLength = OBSTACLE_START;
+
+		stop = true;
+		while (stop) {
 			this.update();
 			this.contrl.updateModel(System.currentTimeMillis());
 			this.timer.pause();
@@ -118,12 +111,12 @@ public class View extends GraphicsProgram {
 		if (e.getKeyCode() == KeyEvent.VK_SPACE) {
 			this.contrl.jump();
 		}
-		
+
 		if (e.getKeyCode() == KeyEvent.VK_DOWN) {
 			this.contrl.duck();
 		}
 	}
-	
+
 	public void keyReleased(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_DOWN) {
 			this.contrl.unduck();
@@ -135,7 +128,9 @@ public class View extends GraphicsProgram {
 	 * model and constructs the view out of that
 	 */
 	public void update() {
-		
+
+		this.model.updateMass();
+
 		// Pointcounter? Its main purpose however was making obstacles
 		pointCounter++;
 
@@ -164,48 +159,33 @@ public class View extends GraphicsProgram {
 			case 0:
 				this.model.getObstacle0().setY(this.model.obstacleState());
 				this.model.getObstacle0().setX(Model.OBSTACLE_START_X);
-				o0 = true;
 				obstacleCounter++;
 				break;
 			case 1:
 				this.model.getObstacle1().setY(this.model.obstacleState());
 				this.model.getObstacle1().setX(Model.OBSTACLE_START_X);
-				o1 = true;
 				obstacleCounter++;
 				break;
 			case 2:
 				this.model.getObstacle2().setY(this.model.obstacleState());
 				this.model.getObstacle2().setX(Model.OBSTACLE_START_X);
-				o2 = true;
 				obstacleCounter -= 2;
 				break;
 
 			}
 		}
 
-		if (o0 == true && (this.model.getObstacle0().getX() > -obstacle0.getWidth())) {
-			obstacle0.setLocation(this.model.getObstacle0().getNewX(), obstacle0.getY());
-			this.model.getObstacle0().setX(this.model.getObstacle0().getNewX());
-			this.add(obstacle0);
-		} else {
-			o0 = false;
-		}
+		obstacle0.setLocation(this.model.getObstacle0().getNewX(), this.model.getObstacle0().getY());
+		this.model.getObstacle0().setX(this.model.getObstacle0().getNewX());
+		this.add(obstacle0);
 
-		if (o1 == true && (this.model.getObstacle1().getX() > -obstacle1.getWidth())) {
-			obstacle1.setLocation(this.model.getObstacle1().getNewX(), obstacle1.getY());
-			this.model.getObstacle1().setX(this.model.getObstacle1().getNewX());
-			this.add(obstacle1);
-		} else {
-			o1 = false;
-		}
+		obstacle1.setLocation(this.model.getObstacle1().getNewX(), this.model.getObstacle1().getY());
+		this.model.getObstacle1().setX(this.model.getObstacle1().getNewX());
+		this.add(obstacle1);
 
-		if (o2 == true && (this.model.getObstacle2().getX() > -obstacle2.getWidth())) {
-			obstacle2.setLocation(this.model.getObstacle2().getNewX(), obstacle2.getY());
-			this.model.getObstacle2().setX(this.model.getObstacle2().getNewX());
-			this.add(obstacle2);
-		} else {
-			o2 = false;
-		}
+		obstacle2.setLocation(this.model.getObstacle2().getNewX(), this.model.getObstacle2().getY());
+		this.model.getObstacle2().setX(this.model.getObstacle2().getNewX());
+		this.add(obstacle2);
 
 		// is the last, so it can be the top layer
 		GRect player = makeGRect(this.model.getHero());
@@ -215,12 +195,27 @@ public class View extends GraphicsProgram {
 		points.setFont("SansSerif-36");
 		add(points);
 
+		if (obstacle0.getX() + obstacle0.getWidth() > this.model.getHero().getX()
+				&& obstacle0.getX() < this.model.getHero().getX() + this.model.getHero().getWidth()) {
+			stop = !this.model.o0Crash();
+		}
+
+		if (obstacle1.getX() + obstacle1.getWidth() > this.model.getHero().getX()
+				&& obstacle1.getX() < this.model.getHero().getX() + this.model.getHero().getWidth()) {
+			stop = !this.model.o1Crash();
+		}
+
+		if (obstacle2.getX() + obstacle2.getWidth() > this.model.getHero().getX()
+				&& obstacle2.getX() < this.model.getHero().getX() + this.model.getHero().getWidth()) {
+			stop = !this.model.o2Crash();
+		}
+
 		obstacleLength -= speed;
 	}
-	
+
 	public GRect makeGRect(Rectangle rec) {
 		GRect grect = new GRect(rec.getX(), rec.getY(), rec.getWidth(), rec.getHeight());
-		if(rec.getColor() != null){
+		if (rec.getColor() != null) {
 			grect.setFillColor(rec.getColor());
 			grect.setFilled(true);
 		}
