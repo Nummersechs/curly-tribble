@@ -136,12 +136,15 @@ public class View extends GraphicsProgram {
 	 */
 	public void update() {
 		
-		// Pointcounter? Its main purpose however is making obstacles
+		// Pointcounter? Its main purpose however was making obstacles
 		pointCounter++;
 
 		// makes the obstacle fastter, the more time has passed
 		if (pointCounter % 1000 == 0 && speed <= SPEED_LIMIT) {
 			speed++;
+			this.model.getObstacle0().setSpeed(speed);
+			this.model.getObstacle1().setSpeed(speed);
+			this.model.getObstacle2().setSpeed(speed);
 		}
 
 		this.removeAll();
